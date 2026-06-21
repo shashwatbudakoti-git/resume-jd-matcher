@@ -7,12 +7,12 @@ Original file is located at
     https://colab.research.google.com/drive/1haYrsm4XykJP76iFXzyoPVMG6PnkUxGE
 """
 
-!pip install pdfplumber
-!pip install streamlit
-!pip install sentence-transformers
-!pip install datasets
-!pip uninstall pillow -y
-!pip install pillow==10.4.0
+#!pip install pdfplumber
+#!pip install streamlit
+#!pip install sentence-transformers
+#!pip install datasets
+#!pip uninstall pillow -y
+#!pip install pillow==10.4.0
 
 import pandas as pd
 import numpy as np
@@ -38,9 +38,9 @@ import os
 from collections import Counter
 from typing import List, Tuple
 
-import nltk
-from nltk.corpus import stopwords
-nltk.download('stopwords', quiet=True)
+#import nltk
+#from nltk.corpus import stopwords
+#nltk.download('stopwords', quiet=True)
 
 import streamlit as st
 
@@ -1036,13 +1036,6 @@ def replace_synonyms(text: str) -> str:
 
     return text_lower
 
-def clean_text(text: str):
-    if not text:
-        return ""
-    text = text.lower()
-    text = re.sub(r'[^a-z0-9\s]', '', text)
-    text = re.sub(r'\s+', ' ', text).strip()
-    return text
 
 def clean_text(text: str) -> str:
     if not text:
@@ -1064,18 +1057,27 @@ def extract_pdf_text(pdf_file):# Extracting all texts from PDF
 
 
 def extract_keywords(text: str, top_n: int = 20) -> list:
-    stop_words = set(stopwords.words('english'))# Get NLTK stopwords (English)
+    # Hardcoded stopwords (no NLTK needed).Streamlit may create problems.
+    stop_words = {
+        'a', 'an', 'and', 'are', 'as', 'at', 'be', 'by', 'for', 'from',
+        'has', 'he', 'in', 'is', 'it', 'its', 'of', 'on', 'that', 'the',
+        'to', 'was', 'were', 'will', 'with', 'i', 'you', 'we', 'they',
+        'this', 'that', 'these', 'those', 'am', 'do', 'does', 'did',
+        'have', 'had', 'having', 'been', 'being', 'would', 'could',
+        'should', 'might', 'must', 'my', 'your', 'his', 'her', 'our',
+        'their', 'me', 'him', 'us', 'them'
+    }
 
     words = clean_text(text).split()
 
     keywords = []
     for w in words:
-        if w not in stop_words and (len(w) > 2 or w.isdigit()): # Filter: remove stopwords, keep meaningful words and numbers
+        if w not in stop_words and (len(w) > 2 or w.isdigit()):
             keywords.append(w)
 
-    freq = Counter(keywords) # Count frequency
+    freq = Counter(keywords)
 
-    return [word for word, _ in freq.most_common(top_n)] # Return top N keywords (based upon frequency)
+    return [word for word, _ in freq.most_common(top_n)]
 
 
 def skill_gap_analysis(jd_text: str, resume_text: str): # Extraction and comparision
