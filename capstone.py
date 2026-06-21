@@ -1681,10 +1681,7 @@ An AI-powered system that automatically screens resumes against job descriptions
 
 ## Installation
 
-```bash
-git clone https://github.com/yourusername/resume-jd-matcher.git
-cd resume-jd-matcher
-pip install -r requirements.txt
+git clone https://github.com/shashwatbudakoti-git/resume-jd-matcher
 streamlit run app.py
 
 #PPT (File also shared seperately)
