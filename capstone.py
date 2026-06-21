@@ -19,6 +19,7 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 import seaborn as sns
+import streamlit as st
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
@@ -44,108 +45,113 @@ from typing import List, Tuple
 
 import streamlit as st
 
-#EDA
-dataset = load_dataset('facehuggerapoorv/resume-jd-match')
-df = pd.DataFrame(dataset['train'])
-print(f"\nDataset size: {len(df)} samples")
-print(f"Columns: {df.columns.tolist()}")
+# EDA (Runs only in Colab, not on Streamlit)
 
-#Basic information
-print(f"\nData types:")
-print(df.dtypes)
+def run_eda():
 
-print("\nFirst 2 rows preview:")
-print(df.head(2))
+    # LOAD DATA
+    dataset = load_dataset('facehuggerapoorv/resume-jd-match')
+    df = pd.DataFrame(dataset['train'])
+    print(f"\nDataset size: {len(df)} samples")
+    print(f"Columns: {df.columns.tolist()}")
 
-#Missing Values
-missing_counts = df.isnull().sum()
-print(missing_counts)
+    # BASIC INFORMATION
+    print(f"\nData types:")
+    print(df.dtypes)
 
-if missing_counts.sum() == 0:
-    print("No missing values found")
+    print("\nFirst 2 rows preview:")
+    print(df.head(2))
 
-#Class Distribution
-class_counts = df['label'].value_counts()
-print(f"\nClass distribution:\n{class_counts}")
+    # MISSING VALUES
+    missing_counts = df.isnull().sum()
+    print(missing_counts)
 
-#Plot
-fig, ax = plt.subplots(figsize=(8, 5))
-colors = ['#e74c3c', '#f39c12', '#2ecc71']
-class_counts.plot(kind='bar', ax=ax, color=colors)
-ax.set_title('Class Distribution (Fit Labels)', fontsize=14)
-ax.set_xlabel('Fit Category')
-ax.set_ylabel('Count')
-ax.set_xticklabels(class_counts.index, rotation=45)
+    if missing_counts.sum() == 0:
+        print("No missing values found")
 
-#Add percentage labels
-total = class_counts.sum()
-for i, v in enumerate(class_counts.values):
-    ax.text(i, v + 5, f'{v/total*100:.1f}%', ha='center', fontsize=11)
+    # CLASS DISTRIBUTION
+    class_counts = df['label'].value_counts()
+    print(f"\nClass distribution:\n{class_counts}")
 
-plt.tight_layout()
-plt.savefig('class_distribution.png', dpi=150)
-plt.show()
+    # PLOT
+    fig, ax = plt.subplots(figsize=(8, 5))
+    colors = ['#e74c3c', '#f39c12', '#2ecc71']
+    class_counts.plot(kind='bar', ax=ax, color=colors)
+    ax.set_title('Class Distribution (Fit Labels)', fontsize=14)
+    ax.set_xlabel('Fit Category')
+    ax.set_ylabel('Count')
+    ax.set_xticklabels(class_counts.index, rotation=45)
 
-#Text length analysis
-df['text_length'] = df['text'].astype(str).str.len()
-df['text_words'] = df['text'].astype(str).str.split().str.len()
+    total = class_counts.sum()
+    for i, v in enumerate(class_counts.values):
+        ax.text(i, v + 5, f'{v/total*100:.1f}%', ha='center', fontsize=11)
 
-print(f"\nText length (characters):")
-print(f"  Min: {df['text_length'].min():,}")
-print(f"  Max: {df['text_length'].max():,}")
-print(f"  Mean: {df['text_length'].mean():,.0f}")
-print(f"  Median: {df['text_length'].median():,.0f}")
+    plt.tight_layout()
+    plt.savefig('class_distribution.png', dpi=150)
+    plt.show()
 
-print(f"\nText length (words):")
-print(f"  Min: {df['text_words'].min():,}")
-print(f"  Max: {df['text_words'].max():,}")
-print(f"  Mean: {df['text_words'].mean():,.0f}")
-print(f"  Median: {df['text_words'].median():,.0f}")
+    # TEXT LENGTH ANALYSIS
+    df['text_length'] = df['text'].astype(str).str.len()
+    df['text_words'] = df['text'].astype(str).str.split().str.len()
 
-# Plot
-fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+    print(f"\nText length (characters):")
+    print(f"  Min: {df['text_length'].min():,}")
+    print(f"  Max: {df['text_length'].max():,}")
+    print(f"  Mean: {df['text_length'].mean():,.0f}")
+    print(f"  Median: {df['text_length'].median():,.0f}")
 
-axes[0].hist(df['text_words'], bins=50, color='#3498db', alpha=0.7, edgecolor='black')
-axes[0].axvline(df['text_words'].median(), color='red', linestyle='--', label=f"Median: {df['text_words'].median():.0f}")
-axes[0].set_title('Text Length Distribution (Words)', fontsize=12)
-axes[0].set_xlabel('Number of Words')
-axes[0].set_ylabel('Frequency')
-axes[0].legend()
+    print(f"\nText length (words):")
+    print(f"  Min: {df['text_words'].min():,}")
+    print(f"  Max: {df['text_words'].max():,}")
+    print(f"  Mean: {df['text_words'].mean():,.0f}")
+    print(f"  Median: {df['text_words'].median():,.0f}")
 
-axes[1].hist(df['text_length'], bins=50, color='#e67e22', alpha=0.7, edgecolor='black')
-axes[1].axvline(df['text_length'].median(), color='red', linestyle='--', label=f"Median: {df['text_length'].median():.0f}")
-axes[1].set_title('Text Length Distribution (Characters)', fontsize=12)
-axes[1].set_xlabel('Number of Characters')
-axes[1].set_ylabel('Frequency')
-axes[1].legend()
+    # TEXT LENGTH PLOTS
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
 
-plt.tight_layout()
-plt.savefig('text_length_distributions.png', dpi=150)
-plt.show()
+    axes[0].hist(df['text_words'], bins=50, color='#3498db', alpha=0.7, edgecolor='black')
+    axes[0].axvline(df['text_words'].median(), color='red', linestyle='--', label=f"Median: {df['text_words'].median():.0f}")
+    axes[0].set_title('Text Length Distribution (Words)', fontsize=12)
+    axes[0].set_xlabel('Number of Words')
+    axes[0].set_ylabel('Frequency')
+    axes[0].legend()
 
-#Sample text inspection
-print("\nSample text (first 500 chars):")
-print(df['text'].iloc[0][:500] + "...")
+    axes[1].hist(df['text_length'], bins=50, color='#e67e22', alpha=0.7, edgecolor='black')
+    axes[1].axvline(df['text_length'].median(), color='red', linestyle='--', label=f"Median: {df['text_length'].median():.0f}")
+    axes[1].set_title('Text Length Distribution (Characters)', fontsize=12)
+    axes[1].set_xlabel('Number of Characters')
+    axes[1].set_ylabel('Frequency')
+    axes[1].legend()
 
-#Duplicate Checks
-duplicate_count = df.duplicated().sum()
-print(f"Duplicate rows: {duplicate_count}")
+    plt.tight_layout()
+    plt.savefig('text_length_distributions.png', dpi=150)
+    plt.show()
 
-#Summary
-print(f"""
-Dataset Size: {len(df):,} samples
-Classes: {class_counts.index.tolist()}
-Class Distribution: No Fit: {class_counts.get('No Fit', 0)}, Potential Fit: {class_counts.get('Potential Fit', 0)}, Good Fit: {class_counts.get('Good Fit', 0)}
-Missing Values: None
-Average Text Length: {df['text_length'].mean():.0f} characters ({df['text_words'].mean():.0f} words)
-Duplicates: {duplicate_count}
+    # SAMPLE TEXT INSPECTION
+    print("\nSample text (first 500 chars):")
+    print(df['text'].iloc[0][:500] + "...")
 
-RECOMMENDATIONS:
-1. No missing values to handle
-2. Class imbalance exists - use stratification in train/test split
-3. Text length varies - ensure model can handle long sequences
-4. Data is ordered by label - shuffle before splitting
-""")
+    # DUPLICATE CHECKS
+    duplicate_count = df.duplicated().sum()
+    print(f"Duplicate rows: {duplicate_count}")
+
+    # SUMMARY
+    print(f"""
+    Dataset Size: {len(df):,} samples
+    Classes: {class_counts.index.tolist()}
+    Class Distribution: No Fit: {class_counts.get('No Fit', 0)}, Potential Fit: {class_counts.get('Potential Fit', 0)}, Good Fit: {class_counts.get('Good Fit', 0)}
+    Missing Values: None
+    Average Text Length: {df['text_length'].mean():.0f} characters ({df['text_words'].mean():.0f} words)
+    Duplicates: {duplicate_count}
+
+    RECOMMENDATIONS:
+    1. No missing values to handle
+    2. Class imbalance exists - use stratification in train/test split
+    3. Text length varies - ensure model can handle long sequences
+    4. Data is ordered by label - shuffle before splitting
+    """)
+
+    return df
 
 #Support Functions
 
@@ -1818,3 +1824,10 @@ datasets==2.14.0
 matplotlib==3.7.2
 seaborn==0.12.2
 """
+
+# COLAB EXECUTION
+if __name__ == "__main__":
+    # EDA for collab
+    df = run_eda()
+
+    print("Colab execution complete!")
