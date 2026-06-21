@@ -1816,27 +1816,3 @@ datasets==2.14.0
 matplotlib==3.7.2
 seaborn==0.12.2
 """
-
-!git init
-!git add .
-!git commit -m "First commit"
-!git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
-!git push -u origin main
-
-https://github.com/shashwatbudakoti-git/resume-jd-matcher
-
-!git config --global user.name "shashwatbudakoti-git"
-!git config --global user.email "shashwat.budakoti@gmail.com"
-
-!git init
-!git add .
-!git commit -m "First commit - Resume-JD Matcher"
-
-!git branch -m main
-!git remote add origin https://github.com/shashwatbudakoti-git/resume-jd-matcher
-!git push -u origin main
-
-!git remote remove origin
-
-# Replace YOUR_USERNAME and YOUR_TOKEN
-!git push -u https://shashwatbudakoti-git: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@github.com/shashwatbudakoti-git/resume-jd-matcher main
